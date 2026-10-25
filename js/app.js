@@ -172,18 +172,26 @@
       ecarts.push(Math.abs(jours[k].getBoundingClientRect().top - window.innerHeight / 2));
     }
 
+    // On n'écrit un style que s'il change : réécrire la même valeur
+    // déclencherait quand même un recalcul de style à chaque scroll.
     for (var j = 0; j < cards.length; j++) {
-      cards[j].style.minHeight = tallest + 'px';
+      var carte = cards[j];
+      var hauteur = tallest + 'px';
+      if (carte.style.minHeight !== hauteur) carte.style.minHeight = hauteur;
       if (tops[j] < window.innerHeight - 40) {
-        UIKit.cls(cards[j], 'visible', true);
-        cards[j].style.transform = 'translateY(0px)';
-      } else {
-        cards[j].style.transform = 'translateY(24px)';
+        UIKit.cls(carte, 'visible', true);
+        if (carte.style.transform !== 'translateY(0px)') carte.style.transform = 'translateY(0px)';
+      } else if (carte.style.transform !== 'translateY(24px)') {
+        carte.style.transform = 'translateY(24px)';
       }
     }
     // Les cases du calendrier apparaissent progressivement à l'approche.
     for (var m = 0; m < jours.length; m++) {
-      jours[m].style.opacity = Math.max(0.15, 1 - ecarts[m] / window.innerHeight);
+      var opacite = Math.max(0.15, 1 - ecarts[m] / window.innerHeight);
+      if (jours[m].__o !== opacite) {
+        jours[m].__o = opacite;
+        jours[m].style.opacity = opacite;
+      }
     }
   }
 
